@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobTrack - Job Application Manager</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            <span>J</span>
+            <h2>JobTrack</h2>
+        </div>
+
+        <nav>
+            <a href="#dashboard" class="active">📊 Dashboard</a>
+            <a href="#applications">💼 Applications</a>
+            <a href="#analytics">📈 Analytics</a>
+        </nav>
+
+        <button id="themeBtn" class="theme-btn">🌙 Dark Mode</button>
+    </aside>
+
+
+    <main class="main">
+
+        <header class="topbar">
+            <div>
+                <h1>Job Dashboard</h1>
+                <p>Track and manage your job applications</p>
+            </div>
+
+            <button class="add-btn" onclick="openModal()">
+                + Add Application
+            </button>
+        </header>
+
+
+        <!-- STATISTICS -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+                <div>
+                    <p>Total Applications</p>
+                    <h2 id="totalApplications">0</h2>
+                </div>
+                <span class="icon blue">💼</span>
+            </div>
+
+            <div class="stat-card">
+                <div>
+                    <p>Interviews</p>
+                    <h2 id="interviews">0</h2>
+                </div>
+                <span class="icon orange">🎤</span>
+            </div>
+
+            <div class="stat-card">
+                <div>
+                    <p>Selected</p>
+                    <h2 id="selected">0</h2>
+                </div>
+                <span class="icon green">🎉</span>
+            </div>
+
+            <div class="stat-card">
+                <div>
+                    <p>Rejected</p>
+                    <h2 id="rejected">0</h2>
+                </div>
+                <span class="icon red">❌</span>
+            </div>
+
+        </section>
+
+
+        <!-- ANALYTICS -->
+
+        <section class="analytics" id="analytics">
+
+            <div class="chart-card">
+                <div class="section-title">
+                    <h2>Application Analytics</h2>
+                    <span>Current Overview</span>
+                </div>
+
+                <canvas id="jobChart"></canvas>
+            </div>
+
+            <div class="upcoming">
+                <div class="section-title">
+                    <h2>Upcoming Interviews</h2>
+                </div>
+
+                <div id="interviewList">
+                    <p class="empty">No upcoming interviews</p>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- APPLICATIONS -->
+
+        <section class="applications" id="applications">
+
+            <div class="application-header">
+
+                <div>
+                    <h2>Job Applications</h2>
+                    <p>Manage all your applications</p>
+                </div>
+
+                <button onclick="exportCSV()" class="export-btn">
+                    📥 Export CSV
+                </button>
+
+            </div>
+
+
+            <div class="filters">
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="🔍 Search company or position..."
+                >
+
+                <select id="statusFilter">
+                    <option value="All">All Status</option>
+                    <option value="Applied">Applied</option>
+                    <option value="Interview">Interview</option>
+                    <option value="Selected">Selected</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+
+                <select id="sortFilter">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="company">Company A-Z</option>
+                </select>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Position</th>
+                            <th>Location</th>
+                            <th>Applied Date</th>
+                            <th>Status</th>
+                            <th>Interview</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="jobTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- MODAL -->
+
+    <div class="modal" id="jobModal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Job Application</h2>
+
+                <button onclick="closeModal()" class="close-btn">
+                    ×
+                </button>
+            </div>
+
+
+            <form id="jobForm">
+
+                <input type="hidden" id="editId">
+
+                <div class="form-grid">
+
+                    <div class="input-group">
+                        <label>Company Name</label>
+                        <input id="company" required placeholder="Google">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Job Position</label>
+                        <input id="position" required placeholder="Frontend Developer">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Location</label>
+                        <input id="location" placeholder="Bangalore / Remote">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Applied Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Status</label>
+
+                        <select id="status">
+                            <option value="Applied">Applied</option>
+                            <option value="Interview">Interview</option>
+                            <option value="Selected">Selected</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Interview Date</label>
+                        <input type="date" id="interviewDate">
+                    </div>
+
+                </div>
+
+                <div class="input-group">
+                    <label>Job URL</label>
+                    <input id="jobUrl" type="url" placeholder="https://company.com/job">
+                </div>
+
+                <div class="input-group">
+                    <label>Notes</label>
+                    <textarea id="notes" placeholder="Add notes..."></textarea>
+                </div>
+
+                <button class="save-btn" type="submit">
+                    Save Application
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
